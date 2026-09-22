@@ -799,16 +799,49 @@
   var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   /* появление при прокрутке */
-  var items = document.querySelectorAll('.rev, .stagger');
+  var items = Array.prototype.slice.call(document.querySelectorAll('.rev, .stagger'));
+  var reveal = function(el){ el.classList.add('on'); };
+
   if (reduce || !('IntersectionObserver' in window)) {
-    items.forEach(function(el){ el.classList.add('on'); });
+    items.forEach(reveal);
   } else {
+    /* Порог держим на нуле. Доля видимой площади считается от ВСЕЙ высоты
+       элемента: блок отзывов выше экрана в несколько раз, и при заметном
+       пороге он на телефоне мог не появиться вообще — на узком экране
+       нужная доля недостижима. Момент появления задаёт rootMargin. */
     var io = new IntersectionObserver(function(entries){
       entries.forEach(function(e){
-        if (e.isIntersecting){ e.target.classList.add('on'); io.unobserve(e.target); }
+        if (e.isIntersecting){ reveal(e.target); io.unobserve(e.target); }
       });
-    }, { threshold: 0.12, rootMargin: '0px 0px -40px' });
+    }, { threshold: 0, rootMargin: '0px 0px -60px' });
     items.forEach(function(el){ io.observe(el); });
+
+    /* Подстраховка на случай, если наблюдатель не отработал: показываем всё,
+       что уже попало в экран. Слушатели снимаются, когда скрытого не осталось. */
+    var onScroll;
+    var sweep = function(){
+      var vh = window.innerHeight || document.documentElement.clientHeight;
+      var pending = false;
+      items.forEach(function(el){
+        if (el.classList.contains('on')) return;
+        var r = el.getBoundingClientRect();
+        if (r.top < vh - 60 && r.bottom > 0){ reveal(el); io.unobserve(el); }
+        else pending = true;
+      });
+      if (!pending){
+        window.removeEventListener('scroll', onScroll);
+        window.removeEventListener('resize', onScroll);
+      }
+    };
+    var ticking = false;
+    onScroll = function(){
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(function(){ ticking = false; sweep(); });
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll);
+    window.addEventListener('load', sweep);
   }
 
   /* прогресс-бар + шапка + кнопка наверх */
