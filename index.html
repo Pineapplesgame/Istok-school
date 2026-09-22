@@ -214,6 +214,25 @@
   .review b{display:block;font-size:15px;color:var(--forest)}
   .review span{font-size:14px;color:var(--muted)}
   .review.empty{border-style:dashed;border-color:var(--leaf-light);background:rgba(255,255,255,.5)}
+  /* Короткие отзывы из группы ВКонтакте */
+  .rv-more{margin-top:30px}
+  .rv-src{font-size:15px;color:var(--muted);margin:0 0 18px}
+  .rv-src a{color:var(--forest);text-decoration:none;border-bottom:1px solid var(--leaf-light)}
+  .rv-src a:hover{border-bottom-color:var(--forest)}
+  .rgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;align-items:start}
+  .rmini{background:var(--card);border:1px solid var(--leaf-pale);border-radius:6px;padding:22px 24px;display:flex;flex-direction:column;transition:transform .2s ease,box-shadow .25s ease}
+  .rmini:hover{transform:translateY(-4px);box-shadow:0 14px 24px -20px rgba(53,96,46,.5)}
+  .rmini p{font-size:15px;line-height:1.62;color:var(--ink);margin:0 0 14px}
+  .rmini footer{margin-top:auto;border-top:1px solid var(--leaf-pale);padding-top:12px}
+  .rmini b{display:block;font-size:14px;color:var(--forest)}
+  .rmini span{font-size:13px;color:var(--muted)}
+  .rv-extra{margin-top:18px}
+  .rv-extra>summary{list-style:none;cursor:pointer;display:inline-flex;align-items:center;gap:10px;font-size:15px;color:var(--forest);background:var(--card);border:1px solid var(--leaf-light);border-radius:999px;padding:11px 24px;transition:background .2s ease,border-color .2s ease}
+  .rv-extra>summary::-webkit-details-marker{display:none}
+  .rv-extra>summary::after{content:"+";font-size:17px;line-height:1;color:var(--leaf)}
+  .rv-extra>summary:hover{background:var(--leaf-pale);border-color:var(--leaf)}
+  .rv-extra[open]>summary{margin-bottom:18px}
+  .rv-extra[open]>summary::after{content:"–"}
 
   /* ---------- памятка ---------- */
   .memo{border:1px solid var(--leaf-light);border-radius:6px;background:var(--card);padding:6px 0}
@@ -305,7 +324,7 @@
   :focus-visible{outline:2px solid var(--wheat);outline-offset:3px}
 
   @media (max-width:1080px){
-    .cards,.reviews{grid-template-columns:repeat(2,1fr)}
+    .cards,.reviews,.rgrid{grid-template-columns:repeat(2,1fr)}
     .slide{flex-basis:calc((100% - 18px)/2)}
     .nav{gap:16px}
     .nav a{font-size:14px}
@@ -329,7 +348,7 @@
   }
   @media (max-width:640px){
     .wrap,.top-in{padding-right:20px;padding-left:calc(var(--rail) + 18px)}
-    .cards,.reviews{grid-template-columns:1fr}
+    .cards,.reviews,.rgrid{grid-template-columns:1fr}
     .slide{flex-basis:86%}
     .s-btn.prev{left:2px}.s-btn.next{right:2px}
     .facts{grid-template-columns:1fr}
@@ -343,7 +362,7 @@
     html{scroll-behavior:auto}
     .rev,.stagger>*{opacity:1;transform:none;transition:none}
     .hero-logo .img,.hero-logo::after,.sec-head .sprig{animation:none}
-    .btn:hover,.btn-wheat:hover,.cards .card:hover,.slide img:hover,.reviews .review:hover,.nav .tg:hover{transform:none}
+    .btn:hover,.btn-wheat:hover,.cards .card:hover,.slide img:hover,.reviews .review:hover,.rmini:hover,.nav .tg:hover{transform:none}
     .track{scroll-behavior:auto}
   }
   .faq-featured{max-width:860px;background:#fff;border:1px solid var(--leaf-pale);border-left:3px solid var(--wheat);border-radius:8px;padding:28px 32px;margin-bottom:32px}
@@ -551,6 +570,59 @@
           <footer><b>Алёна Быкова</b><span>мама будущего первоклассника · февраль 2026</span></footer>
         </article>
       </div>
+
+      <!-- Короткие отзывы, собранные из обсуждения в группе ВКонтакте (сентябрь 2026).
+           Тексты приведены к типографике сайта, смысл не менялся. Шесть видны сразу,
+           остальные три раскрываются по кнопке, чтобы не растягивать страницу. -->
+      <div class="rv-more rev">
+        <p class="rv-src">Отзывы родителей из <a href="https://vk.com/wall-158393246_1648895" target="_blank" rel="noopener">обсуждения в нашей группе ВКонтакте</a></p>
+
+        <div class="rgrid stagger">
+          <article class="rmini">
+            <p>Семейный класс «Исток» — для родителей, которым не всё равно, чему учат ребёнка и что с ним происходит в школе. Наш ребёнок сейчас в 1 классе, и каждый раз, когда его спрашивают, нравится ли ему в школе, он всегда счастливый отвечает: «Да, всё замечательно». И это действительно так.</p>
+            <p>Проверенная годами и поколениями советская программа, всё ориентировано на учёбу. Ничего лишнего. Нет многочисленных «проектов» для галочки и непонятных заданий. Всё чётко и по делу. Здесь учатся счастливые дети.</p>
+            <footer><b>Света Герлинская</b><span>мама первоклассника · сентябрь 2026</span></footer>
+          </article>
+          <article class="rmini">
+            <p>Долго искали школу по реальным отзывам, ходили в «Исток» на подготовку год, сейчас в первом классе. Мне очень нравится окружение моего ребёнка: учитель, дети, родители. Организатор — порядочный человек, для которой в первую очередь важно качество образования. Никаких дополнительных сборов, всё прозрачно.</p>
+            <footer><b>Ольга Королёва</b><span>мама ученика 1 класса · сентябрь 2026</span></footer>
+          </article>
+          <article class="rmini">
+            <p>Очень нравится образовательное пространство! Размеренно, чётко, без воды. Ответственное и внимательное отношение руководителя и педагогов. Дети с нетерпением ждут нового учебного дня — учителя, одноклассников. У меня там занимаются двое — 1 класс и 6 класс. Спокойнее и гармоничнее, чем государственная школа, при этом знания глубже.</p>
+            <footer><b>Зоя Бритос</b><span>мама учеников 1 и 6 классов · сентябрь 2026</span></footer>
+          </article>
+          <article class="rmini">
+            <p>Мы перешли из обычной школы в феврале, со второго класса. Сейчас в 4 классе. Очень довольны обучением по советской программе — считаем её лучшей. Учителя отличные. Ребёнок ходит с большим удовольствием.</p>
+            <footer><b>Анна Рубцова</b><span>мама ученика 4 класса · сентябрь 2026</span></footer>
+          </article>
+          <article class="rmini">
+            <p>Очень довольны: дочка проходила здесь ещё подготовку к школе, сейчас учится в 3 классе. Отдельная её любовь — письмо каллиграфическим пером на чистописании.</p>
+            <footer><b>Инна Емельянова</b><span>мама ученицы 3 класса · сентябрь 2026</span></footer>
+          </article>
+          <article class="rmini">
+            <p>Прекрасная школа! Обучение спокойное, чёткое, классы небольшие. Педагоги замечательные, адекватные — всегда есть обратная связь. Дети не перегружены, каждый ученик получает внимание. Мы в этом году пошли во 2 класс. Я очень довольна, что мы выбрали эту школу.</p>
+            <footer><b>Алёна Тактаева</b><span>мама второклассника · сентябрь 2026</span></footer>
+          </article>
+        </div>
+
+        <details class="rv-extra">
+          <summary>Ещё три отзыва</summary>
+          <div class="rgrid">
+            <article class="rmini">
+              <p>Очень рады, что в Коломне есть такая семейная школа. Это настоящее спасение для нас. Спасибо огромное Екатерине Викторовне! Подход к образованию максимально понятный и простой, педагоги, которые любят свою профессию и детей, проверенная программа, небольшой класс, ответственные родители. Ребёнок ходит с удовольствием. Нет сомнений, что это правильный выбор.</p>
+              <footer><b>Александр Герлинский</b><span>папа первоклассника · сентябрь 2026</span></footer>
+            </article>
+            <article class="rmini">
+              <p>Мы третий год учимся, уже в 3 классе. Ребёнку очень нравится, учитель прекрасная. Ничего лишнего и пустого, как в обычных школах, — только учёба по делу.</p>
+              <footer><b>Диана Севрюкова</b><span>мама ученика 3 класса · сентябрь 2026</span></footer>
+            </article>
+            <article class="rmini">
+              <p>Ребёнок учится в 6 классе с огромным азартом и радостью. Спасибо преподавателям за высочайший уровень образования, заботу, комфорт и горящие глаза нашего шестиклассника!</p>
+              <footer><b>Анна Ларина</b><span>мама шестиклассника · сентябрь 2026</span></footer>
+            </article>
+          </div>
+        </details>
+      </div>
     </div>
   </section>
 
@@ -594,13 +666,12 @@
         <p class="fq">Чем отличается обучение по учебникам 40–80-х годов от современного?</p>
         <ul class="fdash">
           <li>материал изучается по принципу «от простого к сложному»;</li>
-          <li>каждый предмет — на углублённом уровне: это помогает успешнее сдать ОГЭ и ЕГЭ и увереннее выбрать профессию в старших классах;</li>
-          <li>новый материал многократно повторяется и закрепляется, поэтому его хорошо усваивает любой ребёнок;</li>
+          <li>каждый предмет изучается на углублённом уровне. Это помогает успешнее сдать ОГЭ и ЕГЭ и увереннее выбрать профессию в старших классах;</li>
+          <li>новый материал многократно повторяется и закрепляется, поэтому хорошо усваивается детьми;</li>
           <li>дети учатся думать и рассуждать;</li>
           <li>задания понятны и посильны для ребёнка;</li>
-          <li>много задач на отработку изученных тем;</li>
-          <li>развивается логическое мышление;</li>
-          <li>используются наглядные пособия, опыты и экскурсии — так материал понятнее и лучше усваивается;</li>
+          <li>развивается логическое и критическое мышление;</li>
+          <li>используются наглядные пособия, проводятся опыты и экскурсии для лучшего усвоения материала;</li>
           <li>сдержанное оформление с минимумом иллюстраций, чтобы внимание ребёнка не рассеивалось;</li>
           <li>курс рассчитан на 10 классов — это позволяет сдать ЕГЭ уже после 10-го класса.</li>
         </ul>
@@ -610,15 +681,15 @@
       <div class="faq rev">
         <details>
           <summary>Это законно? Ребёнок получит аттестат?</summary>
-          <div class="ans"><div><p>Да. Семейное обучение — законная форма получения образования. Ребёнок прикрепляется к школе-партнёру, проходит там аттестации и получает такой же аттестат, как все остальные.</p></div></div>
+          <div class="ans"><div><p>Да. Семейное обучение — законная форма получения образования. Ребёнок прикрепляется к школе-партнёру, проходит там аттестации и получает документы о переводе в следующий класс. Для получения аттестата дети сдают ОГЭ и ЕГЭ в государственной или частной школе с аккредитацией.</p></div></div>
         </details>
         <details>
           <summary>Сколько это стоит?</summary>
-          <div class="ans"><div><p>«Исток» не берёт плату за обучение — мы не школа и не оказываем платных услуг. Родители совместно несут расходы на помещение, работу педагогов и материалы. Итоговая сумма зависит от числа семей в группе; подробно расскажем при знакомстве.</p></div></div>
+          <div class="ans"><div><p>«Исток» не берёт плату за обучение — мы не оказываем платных услуг. Родители совместно несут расходы на помещение, работу педагогов и материалы.</p></div></div>
         </details>
         <details>
           <summary>Нужно ли родителям самим вести занятия?</summary>
-          <div class="ans"><div><p>Нет. Все предметы ведут профессиональные педагоги. От родителей нужно участие в организации — договориться о расписании, помещении и общих расходах, а не преподавать самим.</p></div></div>
+          <div class="ans"><div><p>Нет. Все предметы ведут профессиональные педагоги. Родители контролируют выполнение домашних заданий.</p></div></div>
         </details>
       </div>
     </div>
