@@ -214,25 +214,18 @@
   .review b{display:block;font-size:15px;color:var(--forest)}
   .review span{font-size:14px;color:var(--muted)}
   .review.empty{border-style:dashed;border-color:var(--leaf-light);background:rgba(255,255,255,.5)}
-  /* Короткие отзывы из группы ВКонтакте */
-  .rv-more{margin-top:30px}
-  .rv-src{font-size:15px;color:var(--muted);margin:0 0 18px}
-  .rv-src a{color:var(--forest);text-decoration:none;border-bottom:1px solid var(--leaf-light)}
-  .rv-src a:hover{border-bottom-color:var(--forest)}
-  .rgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;align-items:start}
-  .rmini{background:var(--card);border:1px solid var(--leaf-pale);border-radius:6px;padding:22px 24px;display:flex;flex-direction:column;transition:transform .2s ease,box-shadow .25s ease}
-  .rmini:hover{transform:translateY(-4px);box-shadow:0 14px 24px -20px rgba(53,96,46,.5)}
-  .rmini p{font-size:15px;line-height:1.62;color:var(--ink);margin:0 0 14px}
-  .rmini footer{margin-top:auto;border-top:1px solid var(--leaf-pale);padding-top:12px}
-  .rmini b{display:block;font-size:14px;color:var(--forest)}
-  .rmini span{font-size:13px;color:var(--muted)}
-  .rv-extra{margin-top:18px}
-  .rv-extra>summary{list-style:none;cursor:pointer;display:inline-flex;align-items:center;gap:10px;font-size:15px;color:var(--forest);background:var(--card);border:1px solid var(--leaf-light);border-radius:999px;padding:11px 24px;transition:background .2s ease,border-color .2s ease}
-  .rv-extra>summary::-webkit-details-marker{display:none}
-  .rv-extra>summary::after{content:"+";font-size:17px;line-height:1;color:var(--leaf)}
-  .rv-extra>summary:hover{background:var(--leaf-pale);border-color:var(--leaf)}
-  .rv-extra[open]>summary{margin-bottom:18px}
-  .rv-extra[open]>summary::after{content:"–"}
+  /* Отзывы: часть скрыта, раскрывается кнопкой на линии */
+  .rv-wrap{position:relative;overflow:hidden}
+  .rv-wrap.anim{transition:max-height .55s cubic-bezier(.22,.61,.36,1)}
+  .rv-fade{position:absolute;left:0;right:0;bottom:0;height:170px;pointer-events:none;opacity:0;transition:opacity .4s ease;background:linear-gradient(to bottom,rgba(240,245,233,0) 0%,rgba(240,245,233,.75) 55%,var(--wash) 100%)}
+  .rv-box.is-collapsed .rv-fade{opacity:1}
+  .rv-line{display:none;position:relative;margin-top:24px;text-align:center}
+  .rv-box.rv-ready .rv-line{display:block}
+  .rv-line::before{content:"";position:absolute;left:0;right:0;top:50%;height:1px;background:linear-gradient(to right,rgba(169,206,139,0),var(--leaf-light) 22%,var(--leaf-light) 78%,rgba(169,206,139,0))}
+  .rv-btn{position:relative;font:inherit;font-size:15px;color:var(--forest);background:var(--wash);border:1px solid var(--leaf-pale);border-radius:999px;padding:11px 26px;cursor:pointer;display:inline-flex;align-items:center;gap:11px;transition:background .2s ease,border-color .2s ease}
+  .rv-btn:hover{background:var(--card);border-color:var(--leaf)}
+  .rv-btn::after{content:"";width:7px;height:7px;margin-top:-4px;border-right:1.6px solid var(--leaf);border-bottom:1.6px solid var(--leaf);transform:rotate(45deg);transition:transform .35s ease}
+  .rv-box:not(.is-collapsed) .rv-btn::after{margin-top:2px;transform:rotate(-135deg)}
 
   /* ---------- памятка ---------- */
   .memo{border:1px solid var(--leaf-light);border-radius:6px;background:var(--card);padding:6px 0}
@@ -324,7 +317,7 @@
   :focus-visible{outline:2px solid var(--wheat);outline-offset:3px}
 
   @media (max-width:1080px){
-    .cards,.reviews,.rgrid{grid-template-columns:repeat(2,1fr)}
+    .cards,.reviews{grid-template-columns:repeat(2,1fr)}
     .slide{flex-basis:calc((100% - 18px)/2)}
     .nav{gap:16px}
     .nav a{font-size:14px}
@@ -348,7 +341,7 @@
   }
   @media (max-width:640px){
     .wrap,.top-in{padding-right:20px;padding-left:calc(var(--rail) + 18px)}
-    .cards,.reviews,.rgrid{grid-template-columns:1fr}
+    .cards,.reviews{grid-template-columns:1fr}
     .slide{flex-basis:86%}
     .s-btn.prev{left:2px}.s-btn.next{right:2px}
     .facts{grid-template-columns:1fr}
@@ -362,7 +355,9 @@
     html{scroll-behavior:auto}
     .rev,.stagger>*{opacity:1;transform:none;transition:none}
     .hero-logo .img,.hero-logo::after,.sec-head .sprig{animation:none}
-    .btn:hover,.btn-wheat:hover,.cards .card:hover,.slide img:hover,.reviews .review:hover,.rmini:hover,.nav .tg:hover{transform:none}
+    .btn:hover,.btn-wheat:hover,.cards .card:hover,.slide img:hover,.reviews .review:hover,.nav .tg:hover{transform:none}
+    .rv-wrap.anim{transition:none}
+    .rv-fade,.rv-btn::after{transition:none}
     .track{scroll-behavior:auto}
   }
   .faq-featured{max-width:860px;background:#fff;border:1px solid var(--leaf-pale);border-left:3px solid var(--wheat);border-radius:8px;padding:28px 32px;margin-bottom:32px}
@@ -550,78 +545,80 @@
         <h2>Что говорят семьи?</h2>
       </div>
 
-      <div class="reviews stagger">
-        <article class="review">
-          <div class="q">&raquo;</div>
-          <p>Вот и закончился учебный год. Хотим сказать большое спасибо нашей школе «Исток»! Необыкновенные учителя, мастерски владеющие методикой, благоприятный психологический климат, увлекательные занятия. Дети усваивают материал без спешки, грамотная подача, индивидуальный подход, учителя всегда идут навстречу. Ребёнок научился учиться сам.</p>
-          <p>Учебники необыкновенные. Действительно, это не «Литературное чтение» — это «Родная речь»: тексты просто льются, поражая глубиной и красотой речи. Математика — отдельная песня, русский — выше всяких похвал. На занятиях музыкой каждый находит своё самовыражение, на рисовании и труде нет предела креативу. Английский наши дети тоже осваивают легко и с удовольствием!</p>
-          <footer><b>Инна Романова</b><span>мама ученика · июнь 2025</span></footer>
-        </article>
-        <article class="review">
-          <div class="q">&raquo;</div>
-          <p>Перешли в этот семейный класс в середине учебного года из гимназии. Ушли из-за обилия электронных ресурсов, где нужно было регистрировать ребёнка; учебников с замудрёнными правилами и без логической структуры; лишних предметов; проектов, которые не под силу первокласснику и требуют полной вовлечённости родителя.</p>
-          <p>Здесь учебники логичные, понятные семилетнему ребёнку, учителя прекрасные, обстановка спокойная, класс маленький — все условия для комфортного обучения. Появилось больше свободного времени на кружки и дополнительные занятия. Спасибо Екатерине, что организовала такой замечательный класс в нашем городе.</p>
-          <footer><b>Полина Игоревна</b><span>мама первоклассника</span></footer>
-        </article>
-        <article class="review">
-          <div class="q">&raquo;</div>
-          <p>Ходим на подготовку к школе к Елене Александровне — преподаватель просто восторг! Редкое сочетание душевности, необыкновенной позитивной энергии и, вместе с тем, строгости. Профессионал своего дела с большой буквы, закончила физмат.</p>
-          <p>Ребёнок бежит с удовольствием: тёплая атмосфера, уютные классы, качественные наглядные материалы. Всё чётко организовано на высшем уровне.</p>
-          <footer><b>Алёна Быкова</b><span>мама будущего первоклассника · февраль 2026</span></footer>
-        </article>
-      </div>
-
-      <!-- Короткие отзывы, собранные из обсуждения в группе ВКонтакте (сентябрь 2026).
-           Тексты приведены к типографике сайта, смысл не менялся. Шесть видны сразу,
-           остальные три раскрываются по кнопке, чтобы не растягивать страницу. -->
-      <div class="rv-more rev">
-        <p class="rv-src">Отзывы родителей из <a href="https://vk.com/wall-158393246_1648895" target="_blank" rel="noopener">обсуждения в нашей группе ВКонтакте</a></p>
-
-        <div class="rgrid stagger">
-          <article class="rmini">
-            <p>Семейный класс «Исток» — для родителей, которым не всё равно, чему учат ребёнка и что с ним происходит в школе. Наш ребёнок сейчас в 1 классе, и каждый раз, когда его спрашивают, нравится ли ему в школе, он всегда счастливый отвечает: «Да, всё замечательно». И это действительно так.</p>
-            <p>Проверенная годами и поколениями советская программа, всё ориентировано на учёбу. Ничего лишнего. Нет многочисленных «проектов» для галочки и непонятных заданий. Всё чётко и по делу. Здесь учатся счастливые дети.</p>
-            <footer><b>Света Герлинская</b><span>мама первоклассника · сентябрь 2026</span></footer>
-          </article>
-          <article class="rmini">
-            <p>Долго искали школу по реальным отзывам, ходили в «Исток» на подготовку год, сейчас в первом классе. Мне очень нравится окружение моего ребёнка: учитель, дети, родители. Организатор — порядочный человек, для которой в первую очередь важно качество образования. Никаких дополнительных сборов, всё прозрачно.</p>
-            <footer><b>Ольга Королёва</b><span>мама ученика 1 класса · сентябрь 2026</span></footer>
-          </article>
-          <article class="rmini">
-            <p>Очень нравится образовательное пространство! Размеренно, чётко, без воды. Ответственное и внимательное отношение руководителя и педагогов. Дети с нетерпением ждут нового учебного дня — учителя, одноклассников. У меня там занимаются двое — 1 класс и 6 класс. Спокойнее и гармоничнее, чем государственная школа, при этом знания глубже.</p>
-            <footer><b>Зоя Бритос</b><span>мама учеников 1 и 6 классов · сентябрь 2026</span></footer>
-          </article>
-          <article class="rmini">
-            <p>Мы перешли из обычной школы в феврале, со второго класса. Сейчас в 4 классе. Очень довольны обучением по советской программе — считаем её лучшей. Учителя отличные. Ребёнок ходит с большим удовольствием.</p>
-            <footer><b>Анна Рубцова</b><span>мама ученика 4 класса · сентябрь 2026</span></footer>
-          </article>
-          <article class="rmini">
-            <p>Очень довольны: дочка проходила здесь ещё подготовку к школе, сейчас учится в 3 классе. Отдельная её любовь — письмо каллиграфическим пером на чистописании.</p>
-            <footer><b>Инна Емельянова</b><span>мама ученицы 3 класса · сентябрь 2026</span></footer>
-          </article>
-          <article class="rmini">
-            <p>Прекрасная школа! Обучение спокойное, чёткое, классы небольшие. Педагоги замечательные, адекватные — всегда есть обратная связь. Дети не перегружены, каждый ученик получает внимание. Мы в этом году пошли во 2 класс. Я очень довольна, что мы выбрали эту школу.</p>
-            <footer><b>Алёна Тактаева</b><span>мама второклассника · сентябрь 2026</span></footer>
-          </article>
-        </div>
-
-        <details class="rv-extra">
-          <summary>Ещё три отзыва</summary>
-          <div class="rgrid">
-            <article class="rmini">
+      <div class="rv-box is-collapsed" id="rvBox">
+        <div class="rv-wrap" id="rvWrap">
+          <div class="reviews stagger">
+            <article class="review">
+              <div class="q">&raquo;</div>
+              <p>Вот и закончился учебный год. Хотим сказать большое спасибо нашей школе «Исток»! Необыкновенные учителя, мастерски владеющие методикой, благоприятный психологический климат, увлекательные занятия. Дети усваивают материал без спешки, грамотная подача, индивидуальный подход, учителя всегда идут навстречу. Ребёнок научился учиться сам.</p>
+              <p>Учебники необыкновенные. Действительно, это не «Литературное чтение» — это «Родная речь»: тексты просто льются, поражая глубиной и красотой речи. Математика — отдельная песня, русский — выше всяких похвал. На занятиях музыкой каждый находит своё самовыражение, на рисовании и труде нет предела креативу. Английский наши дети тоже осваивают легко и с удовольствием!</p>
+              <footer><b>Инна Романова</b><span>мама ученика · июнь 2025</span></footer>
+            </article>
+            <article class="review">
+              <div class="q">&raquo;</div>
+              <p>Перешли в этот семейный класс в середине учебного года из гимназии. Ушли из-за обилия электронных ресурсов, где нужно было регистрировать ребёнка; учебников с замудрёнными правилами и без логической структуры; лишних предметов; проектов, которые не под силу первокласснику и требуют полной вовлечённости родителя.</p>
+              <p>Здесь учебники логичные, понятные семилетнему ребёнку, учителя прекрасные, обстановка спокойная, класс маленький — все условия для комфортного обучения. Появилось больше свободного времени на кружки и дополнительные занятия. Спасибо Екатерине, что организовала такой замечательный класс в нашем городе.</p>
+              <footer><b>Полина Игоревна</b><span>мама первоклассника</span></footer>
+            </article>
+            <article class="review">
+              <div class="q">&raquo;</div>
+              <p>Ходим на подготовку к школе к Елене Александровне — преподаватель просто восторг! Редкое сочетание душевности, необыкновенной позитивной энергии и, вместе с тем, строгости. Профессионал своего дела с большой буквы, закончила физмат.</p>
+              <p>Ребёнок бежит с удовольствием: тёплая атмосфера, уютные классы, качественные наглядные материалы. Всё чётко организовано на высшем уровне.</p>
+              <footer><b>Алёна Быкова</b><span>мама будущего первоклассника · февраль 2026</span></footer>
+            </article>
+            <article class="review">
+              <div class="q">&raquo;</div>
+              <p>Семейный класс «Исток» — для родителей, которым не всё равно, чему учат ребёнка и что с ним происходит в школе. Наш ребёнок сейчас в 1 классе, и каждый раз, когда его спрашивают, нравится ли ему в школе, он всегда счастливый отвечает: «Да, всё замечательно». И это действительно так.</p>
+              <p>Проверенная годами и поколениями советская программа, всё ориентировано на учёбу. Ничего лишнего. Нет многочисленных «проектов» для галочки и непонятных заданий. Всё чётко и по делу. Здесь учатся счастливые дети.</p>
+              <footer><b>Света Герлинская</b><span>мама первоклассника · сентябрь 2026</span></footer>
+            </article>
+            <article class="review">
+              <div class="q">&raquo;</div>
+              <p>Очень нравится образовательное пространство! Размеренно, чётко, без воды. Ответственное и внимательное отношение руководителя и педагогов. Дети с нетерпением ждут нового учебного дня — учителя, одноклассников. У меня там занимаются двое — 1 класс и 6 класс. Спокойнее и гармоничнее, чем государственная школа, при этом знания глубже.</p>
+              <footer><b>Зоя Бритос</b><span>мама учеников 1 и 6 классов · сентябрь 2026</span></footer>
+            </article>
+            <article class="review">
+              <div class="q">&raquo;</div>
               <p>Очень рады, что в Коломне есть такая семейная школа. Это настоящее спасение для нас. Спасибо огромное Екатерине Викторовне! Подход к образованию максимально понятный и простой, педагоги, которые любят свою профессию и детей, проверенная программа, небольшой класс, ответственные родители. Ребёнок ходит с удовольствием. Нет сомнений, что это правильный выбор.</p>
               <footer><b>Александр Герлинский</b><span>папа первоклассника · сентябрь 2026</span></footer>
             </article>
-            <article class="rmini">
+            <article class="review">
+              <div class="q">&raquo;</div>
+              <p>Долго искали школу по реальным отзывам, ходили в «Исток» на подготовку год, сейчас в первом классе. Мне очень нравится окружение моего ребёнка: учитель, дети, родители. Организатор — порядочный человек, для которой в первую очередь важно качество образования. Никаких дополнительных сборов, всё прозрачно.</p>
+              <footer><b>Ольга Королёва</b><span>мама ученика 1 класса · сентябрь 2026</span></footer>
+            </article>
+            <article class="review">
+              <div class="q">&raquo;</div>
+              <p>Прекрасная школа! Обучение спокойное, чёткое, классы небольшие. Педагоги замечательные, адекватные — всегда есть обратная связь. Дети не перегружены, каждый ученик получает внимание. Мы в этом году пошли во 2 класс. Я очень довольна, что мы выбрали эту школу.</p>
+              <footer><b>Алёна Тактаева</b><span>мама второклассника · сентябрь 2026</span></footer>
+            </article>
+            <article class="review">
+              <div class="q">&raquo;</div>
+              <p>Мы перешли из обычной школы в феврале, со второго класса. Сейчас в 4 классе. Очень довольны обучением по советской программе — считаем её лучшей. Учителя отличные. Ребёнок ходит с большим удовольствием.</p>
+              <footer><b>Анна Рубцова</b><span>мама ученика 4 класса · сентябрь 2026</span></footer>
+            </article>
+            <article class="review">
+              <div class="q">&raquo;</div>
               <p>Мы третий год учимся, уже в 3 классе. Ребёнку очень нравится, учитель прекрасная. Ничего лишнего и пустого, как в обычных школах, — только учёба по делу.</p>
               <footer><b>Диана Севрюкова</b><span>мама ученика 3 класса · сентябрь 2026</span></footer>
             </article>
-            <article class="rmini">
+            <article class="review">
+              <div class="q">&raquo;</div>
               <p>Ребёнок учится в 6 классе с огромным азартом и радостью. Спасибо преподавателям за высочайший уровень образования, заботу, комфорт и горящие глаза нашего шестиклассника!</p>
               <footer><b>Анна Ларина</b><span>мама шестиклассника · сентябрь 2026</span></footer>
             </article>
+            <article class="review">
+              <div class="q">&raquo;</div>
+              <p>Очень довольны: дочка проходила здесь ещё подготовку к школе, сейчас учится в 3 классе. Отдельная её любовь — письмо каллиграфическим пером на чистописании.</p>
+              <footer><b>Инна Емельянова</b><span>мама ученицы 3 класса · сентябрь 2026</span></footer>
+            </article>
           </div>
-        </details>
+          <span class="rv-fade" aria-hidden="true"></span>
+        </div>
+        <!-- Кнопка появляется скриптом: без JS список просто показан целиком. -->
+        <div class="rv-line">
+          <button type="button" class="rv-btn" id="rvBtn" aria-expanded="false" aria-controls="rvWrap"><span id="rvBtnText">Показать ещё 8 отзывов</span></button>
+        </div>
       </div>
     </div>
   </section>
@@ -925,6 +922,77 @@
         }
       });
     });
+  }
+
+  /* отзывы: показываем первые несколько, остальные разворачиваются кнопкой.
+     Без JS класс rv-ready не появится — кнопка скрыта, список виден целиком. */
+  var rvBox = document.getElementById('rvBox');
+  if (rvBox) {
+    var rvWrap = document.getElementById('rvWrap');
+    var rvBtn = document.getElementById('rvBtn');
+    var rvText = document.getElementById('rvBtnText');
+    var rvCards = rvWrap.querySelectorAll('.review');
+    var PEEK = 96;
+
+    var shownCount = function(){ return window.innerWidth <= 640 ? 2 : 4; };
+    var plural = function(n){
+      var a = n % 10, b = n % 100;
+      if (a === 1 && b !== 11) return 'отзыв';
+      if (a >= 2 && a <= 4 && (b < 10 || b > 20)) return 'отзыва';
+      return 'отзывов';
+    };
+    var cutHeight = function(){
+      var n = shownCount();
+      return rvCards.length > n ? Math.round(rvCards[n].offsetTop + PEEK) : 0;
+    };
+    var isCollapsed = function(){ return rvBox.classList.contains('is-collapsed'); };
+
+    var applyCollapsed = function(){
+      var h = cutHeight();
+      if (!h) return;
+      rvWrap.style.maxHeight = h + 'px';
+      rvBox.classList.add('is-collapsed');
+      rvBtn.setAttribute('aria-expanded', 'false');
+      var rest = rvCards.length - shownCount();
+      rvText.textContent = 'Показать ещё ' + rest + ' ' + plural(rest);
+    };
+
+    var expand = function(){
+      rvWrap.style.maxHeight = rvWrap.scrollHeight + 'px';
+      rvBox.classList.remove('is-collapsed');
+      rvBtn.setAttribute('aria-expanded', 'true');
+      rvText.textContent = 'Свернуть';
+      var done = function(){
+        rvWrap.style.maxHeight = 'none';
+        rvWrap.removeEventListener('transitionend', done);
+      };
+      if (reduce) done(); else rvWrap.addEventListener('transitionend', done);
+    };
+
+    var collapse = function(){
+      rvWrap.style.maxHeight = rvWrap.scrollHeight + 'px';
+      requestAnimationFrame(function(){ requestAnimationFrame(applyCollapsed); });
+      /* если пользователь уже ниже блока — вернуть его к заголовку */
+      if (rvBox.getBoundingClientRect().top < 0) {
+        rvBox.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
+      }
+    };
+
+    if (cutHeight()) {
+      rvBox.classList.add('rv-ready');
+      rvWrap.classList.add('anim');
+      applyCollapsed();
+      rvBtn.addEventListener('click', function(){
+        if (isCollapsed()) expand(); else collapse();
+      });
+      /* высота карточек зависит от шрифтов и ширины окна — пересчитываем */
+      window.addEventListener('load', function(){ if (isCollapsed()) applyCollapsed(); });
+      var rvTimer;
+      window.addEventListener('resize', function(){
+        clearTimeout(rvTimer);
+        rvTimer = setTimeout(function(){ if (isCollapsed()) applyCollapsed(); }, 150);
+      });
+    }
   }
 })();
 </script>
