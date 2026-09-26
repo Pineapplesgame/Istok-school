@@ -1,0 +1,6 @@
+# Сайт открыт для индексации целиком — закрывать нечего.
+# При смене домена поправить адрес карты сайта ниже.
+User-agent: *
+Allow: /
+
+Sitemap: https://pineapplesgame.github.io/Istok-school/sitemap.xml
