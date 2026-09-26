@@ -841,9 +841,11 @@
     items.forEach(function(el){ io.observe(el); });
 
     /* Подстраховка на случай, если наблюдатель не отработал: показываем всё,
-       что уже попало в экран. Слушатели снимаются, когда скрытого не осталось. */
-    var onScroll;
-    var sweep = function(){
+       что уже попало в экран. Слушатели снимаются, когда скрытого не осталось.
+       Имена здесь начинаются с reveal — ниже по файлу есть своя функция
+       onScroll для полосы прогресса и кнопки «наверх», и её нельзя перекрывать. */
+    var revealTick;
+    var revealSweep = function(){
       var vh = window.innerHeight || document.documentElement.clientHeight;
       var pending = false;
       items.forEach(function(el){
@@ -853,19 +855,19 @@
         else pending = true;
       });
       if (!pending){
-        window.removeEventListener('scroll', onScroll);
-        window.removeEventListener('resize', onScroll);
+        window.removeEventListener('scroll', revealTick);
+        window.removeEventListener('resize', revealTick);
       }
     };
-    var ticking = false;
-    onScroll = function(){
-      if (ticking) return;
-      ticking = true;
-      requestAnimationFrame(function(){ ticking = false; sweep(); });
+    var revealTicking = false;
+    revealTick = function(){
+      if (revealTicking) return;
+      revealTicking = true;
+      requestAnimationFrame(function(){ revealTicking = false; revealSweep(); });
     };
-    window.addEventListener('scroll', onScroll, { passive: true });
-    window.addEventListener('resize', onScroll);
-    window.addEventListener('load', sweep);
+    window.addEventListener('scroll', revealTick, { passive: true });
+    window.addEventListener('resize', revealTick);
+    window.addEventListener('load', revealSweep);
   }
 
   /* прогресс-бар + шапка + кнопка наверх */
