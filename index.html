@@ -228,6 +228,9 @@
   .lightbox .close{position:absolute;top:22px;right:26px;width:44px;height:44px;border-radius:50%;border:0;
     background:rgba(255,255,255,.14);color:#fff;font-size:24px;cursor:pointer;line-height:1}
   .lightbox .close:hover{background:rgba(255,255,255,.26)}
+  /* фон не прокручивается под открытым фото; --sbw компенсирует
+     исчезнувшую полосу прокрутки, чтобы страница не дёрнулась вбок */
+  html.lb-open{overflow:hidden;padding-right:var(--sbw,0px)}
 
   /* ---------- отзывы ---------- */
   .reviews{display:grid;grid-template-columns:repeat(2,1fr);gap:22px;align-items:start}
@@ -939,6 +942,11 @@
 
     /* лайтбокс — только для реальных фото (img) */
     var lb = null;
+    function closeLb(){
+      if (!lb) return;
+      lb.classList.remove('open');
+      document.documentElement.classList.remove('lb-open');
+    }
     track.addEventListener('click', function(e){
       var img = e.target.closest('img');
       if (!img) return;
@@ -948,12 +956,18 @@
         lb.innerHTML = '<button class="close" aria-label="Закрыть">&times;</button><img alt="">';
         document.body.appendChild(lb);
         lb.addEventListener('click', function(ev){
-          if (ev.target === lb || ev.target.classList.contains('close')) lb.classList.remove('open');
+          if (ev.target === lb || ev.target.classList.contains('close')) closeLb();
         });
-        document.addEventListener('keydown', function(ev){ if(ev.key==='Escape') lb.classList.remove('open'); });
+        document.addEventListener('keydown', function(ev){ if(ev.key==='Escape') closeLb(); });
       }
-      lb.querySelector('img').src = img.src;
+      var big = lb.querySelector('img');
+      big.src = img.src;
+      big.alt = img.alt || '';
+      /* ширину полосы прокрутки измеряем до блокировки */
+      var sbw = window.innerWidth - document.documentElement.clientWidth;
+      document.documentElement.style.setProperty('--sbw', sbw + 'px');
       lb.classList.add('open');
+      document.documentElement.classList.add('lb-open');
     });
   }
 
@@ -965,20 +979,39 @@
       var ans = d.querySelector('.ans');
       var sum = d.querySelector('summary');
       if (!ans || !sum) return;
+      var onEnd = null, timer = null;
+
       sum.addEventListener('click', function(e){
         e.preventDefault();
-        if (d.open){
-          ans.style.height = ans.scrollHeight + 'px';
-          requestAnimationFrame(function(){ ans.style.height = '0px'; });
-          var closeEnd = function(){ d.open = false; ans.style.height = ''; ans.removeEventListener('transitionend', closeEnd); };
-          ans.addEventListener('transitionend', closeEnd);
-        } else {
-          d.open = true;
-          ans.style.height = '0px';
-          requestAnimationFrame(function(){ ans.style.height = ans.scrollHeight + 'px'; });
-          var openEnd = function(){ ans.style.height = 'auto'; ans.removeEventListener('transitionend', openEnd); };
-          ans.addEventListener('transitionend', openEnd);
-        }
+
+        /* если предыдущая анимация ещё идёт — обрываем её, иначе её завершение
+           сработает уже для нового направления и собьёт состояние */
+        if (onEnd){ ans.removeEventListener('transitionend', onEnd); onEnd = null; }
+        clearTimeout(timer);
+
+        var opening = !d.open;
+        if (opening) d.open = true;          /* содержимое должно быть в потоке, чтобы его измерить */
+        var from = opening ? 0 : ans.scrollHeight;
+        var to   = opening ? ans.scrollHeight : 0;
+
+        ans.style.height = from + 'px';
+        /* Принудительный пересчёт стилей. Без него браузер видит переход
+           сразу из height:auto в 0 и не анимирует его вовсе: transitionend
+           не приходит, details остаётся open, и ответ больше не открывается. */
+        void ans.offsetHeight;
+        ans.style.height = to + 'px';
+
+        var done = function(){
+          if (onEnd){ ans.removeEventListener('transitionend', onEnd); onEnd = null; }
+          clearTimeout(timer); timer = null;
+          if (opening) ans.style.height = 'auto';
+          else { d.open = false; ans.style.height = ''; }
+        };
+        onEnd = function(ev){
+          if (ev.target === ans && ev.propertyName === 'height') done();
+        };
+        ans.addEventListener('transitionend', onEnd);
+        timer = setTimeout(done, 500);       /* страховка, если transitionend не придёт */
       });
     });
   }
